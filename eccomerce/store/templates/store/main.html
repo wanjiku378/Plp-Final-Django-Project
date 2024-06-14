@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    <script>
+      let user = '{{request.user}}'
+
+      function getToken(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  // Does this cookie string begin with the name we want?
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+      const csrftoken = getToken('csrftoken');
+
+      function getCookie(name) {
+        // Split cookie string and get all individual name=value pairs in an array
+        let cookieArr = document.cookie.split(";")
+
+        // Loop through the array elements
+        for(let i = 0; i < cookieArr.length; i++){
+          let cookiePair = cookieArr[i].split("=");
+
+          // Removing white space at the beginning of the cookie name and compare it with the given string
+          if (name == cookiePair[0].trim()){
+            //decode the cookie value and return
+            return decodeURIComponent(cookiePair[1]);
+          }
+        }
+        return null;
+      }
+
+      let cart = JSON.parse(getCookie('cart'))
+      if (cart == undefined){
+        cart = {}
+        console.log('Cart was created')
+        document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"
+      }
+      console.log('Cart:', cart)
+
+
+    </script>
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="{% url 'store' %}">THRIFT STORE</a><br><br>
+      
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'store' %}">Home <span class="sr-only">(current)</span></a>
+            </li>
+          </ul>
+          <div class="form-inline my-2 my-lg-0">
+            
+            <a href="{% url 'cart' %}">
+               <img  id="cart-icon" src="{% static 'images/cart.png' %}">
+           </a>
+           <p id="cart-total">{{ cartItems }}</p>
+          </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}
+
+        {% endblock content %}
+    </div><br>
+
+    <footer class="container-color"><br>
+      <section class="container">
+          <div class="unequal-three-grid">
+              <div>
+                  <h3>Contact</h3>
+                  <div class="gray-section-icons">
+                      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M20.49 15.63l-4.65-.72a1.59 1.59 0 00-1.46.45l-1.82 1.83a15.45 15.45 0 01-7.19-7.2L6.19 7.6a1.59 1.59 0 00.45-1.46l-.72-4.64A1.61 1.61 0 004.34.38H2.28A1.61 1.61 0 00.67 1.99a19.31 19.31 0 0019.31 19.32 1.61 1.61 0 001.61-1.61v-2.06a1.61 1.61 0 00-1.1-1.54z"/>
+                      </svg>
+                      <p>+ 254 795 522 757</p>
+                  </div>
+                  <div class="gray-section-icons">
+                      <svg class="email-icon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M12 13.065l-9.437-6.31a.75.75 0 0 1-.312-.678l.287-1.924A1.5 1.5 0 0 1 4.02 3h15.96a1.5 1.5 0 0 1 1.482 1.153l.287 1.924a.75.75 0 0 1-.312.678L12 13.065zm-9 7.42V8.879L8.276 12.5 12 14.935l3.724-2.435L21 8.879v11.606a1.5 1.5 0 0 1-1.5 1.5H4.5a1.5 1.5 0 0 1-1.5-1.5z"/>
+                      </svg>
+                      <p>kiosk@gmail.com</p>
+                  </div>
+              </div>
+              <div>
+                  <h3>Do you have any comments?</h3>
+                  <input class="comment-input" type="text" placeholder="First Name"><br><br>
+                  <input class="comment-input" type="text" Placeholder="Last Name"><br><br>
+                  <input class="comment-input" type="email" placeholder="Email"><br><br>
+                  <button class="btn" type="submit">Submit</button>
+              </div>
+              <div>
+                  <h3>Follow Us</h3>
+                  <div class="gray-section-icons">
+                      <svg class="facebook-icon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M22.675 0h-21.35C.595 0 0 .593 0 1.326v21.348C0 23.405.595 24 1.325 24h11.482v-9.293H9.689v-3.622h3.118V8.413c0-3.096 1.893-4.787 4.659-4.787 1.325 0 2.462.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.764v2.31h3.59l-.467 3.622h-3.123V24h6.116C23.406 24 24 23.405 24 22.674V1.326C24 .593 23.406 0 22.675 0z"/>
+                      </svg>
+                      <p>Facebook</p>
+                  </div>
+                  <div class="gray-section-icons">
+                      <svg class="twitter-icon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M23.954 4.569c-.885.392-1.83.656-2.825.775 1.014-.608 1.794-1.574 2.165-2.723-.95.555-2.005.959-3.127 1.184-.897-.959-2.173-1.559-3.591-1.559-2.72 0-4.924 2.204-4.924 4.917 0 .39.045.765.127 1.124-4.09-.205-7.719-2.164-10.148-5.144-.424.722-.666 1.561-.666 2.457 0 1.694.865 3.188 2.178 4.065-.803-.026-1.56-.247-2.228-.616v.061c0 2.367 1.685 4.342 3.918 4.787-.41.111-.84.171-1.285.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.415-1.68 1.319-3.809 2.105-6.102 2.105-.396 0-.779-.023-1.17-.067 2.179 1.397 4.768 2.211 7.557 2.211 9.054 0 14-7.496 14-13.986 0-.21 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/>
+                      </svg>
+                      <p>Twitter</p>
+                  </div>
+                  <div class="gray-section-icons">
+                      <svg class="instagram-icon icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.17.056 1.97.24 2.42.51a4.897 4.897 0 011.78 1.78c.27.45.454 1.25.51 2.42.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.056 1.17-.24 1.97-.51 2.42a4.897 4.897 0 01-1.78 1.78c-.45.27-1.25.454-2.42.51-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.056-1.97-.24-2.42-.51a4.897 4.897 0 01-1.78-1.78c-.27-.45-.454-1.25-.51-2.42-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.056-1.17.24-1.97.51-2.42a4.897 4.897 0 011.78-1.78c.45-.27 1.25-.454 2.42-.51 1.266-.058 1.646-.07 4.85-.07zm0-2.163C8.755 0 8.338.012 7.052.07 5.762.129 4.587.338 3.633.875a6.872 6.872 0 00-2.454 2.454C.633 4.783.424 5.958.365 7.248.307 8.534.295 8.951.295 12c0 3.049.012 3.466.07 4.752.059 1.29.268 2.465.813 3.419a6.872 6.872 0 002.454 2.454c.954.545 2.129.754 3.419.813 1.286.058 1.703.07 4.752.07s3.466-.012 4.752-.07c1.29-.059 2.465-.268 3.419-.813a6.872 6.872 0 002.454-2.454c.545-.954.754-2.129.813-3.419.058-1.286.07-1.703.07-4.752s-.012-3.466-.07-4.752c-.059-1.29-.268-2.465-.813-3.419a6.872 6.872 0 00-2.454-2.454C19.413.338 18.238.129 16.948.07 15.662.012 15.245 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zm0 10.162a3.999 3.999 0 110-8 3.999 3.999 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.882 0 1.44 1.44 0 012.882 0z"/>
+                      </svg>
+                      <p>Instagram</p>
+                  </div>
+              </div>
+          </div><br><hr>
+          <p class="center-text">2024 Kiosk  All rights reserved . Privacy . Terms . Site Map</p><br>
+      </section>
+  </footer>
+
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+  <script src="{% static 'js/cart.js' %}"></script>
+  
+</body>
+</body>
+</html>
